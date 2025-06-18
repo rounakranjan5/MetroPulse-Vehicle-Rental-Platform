@@ -1,0 +1,52 @@
+
+<div class="container my-5">
+  <div class="card shadow-lg mx-auto" style="max-width: 700px; border-radius: 12px;">
+    <div class="card-body">
+      <h2 class="card-title mb-4 text-center" style="font-weight: bold; color: #2c3e50;">Edit Vehicle</h2>
+
+      <%= form_with model: [@station, @vehicle], local: true do |form| %>
+        <% if @vehicle.errors.any? %>
+          <div class="alert alert-danger">
+            <h5>There were some errors:</h5>
+            <ul>
+              <% @vehicle.errors.full_messages.each do |msg| %>
+                <li><%= msg %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="mb-3">
+          <%= form.label :name, class: "form-label" %>
+          <%= form.text_field :name, class: "form-control" %>
+        </div>
+
+        <div class="mb-3">
+          <%= form.label :condition, class: "form-label" %>
+          <%= form.select :condition, ['Brand New < 1 year Used', 'New 2-4 Year Used','Mid 5-7 Years Used','Old > 7 years Old'], {}, class: "form-select" %>
+        </div>
+
+       
+        <div class="mb-3">
+            <%= form.label :price_per_hour, "Price per hour (₹)", class: "form-label" %>
+            <%= form.number_field :price_per_hour, class: "form-control", placeholder: "e.g. 150", min: 0, step: 10.0 , required: true %>
+        </div>
+
+         <div class="mb-3">
+          <%= form.label :available, "Availability Status", class: "form-label" %>
+          <%= form.select :available, [['Available',true],['Not Available',false]], {}, class: "form-select" , required: true %>
+        </div>
+
+        <div class="mb-3">
+          <%= form.label :image_url, "Image URL", class: "form-label" %>
+          <%= form.text_field :image_url, class: "form-control" %>
+        </div>
+
+        <div class="d-flex justify-content-between">
+          <%= form.submit "Update Vehicle", class: "btn btn-primary" %>
+          <%= link_to "Cancel", rental_station_vehicles_path(@station), class: "btn btn-secondary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

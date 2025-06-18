@@ -1,0 +1,5 @@
+class AddAvailableToVehicles < ActiveRecord::Migration[8.0]
+  def change
+    add_column :vehicles, :available, :boolean, default:true
+  end
+end

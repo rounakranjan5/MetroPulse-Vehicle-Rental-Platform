@@ -1,0 +1,232 @@
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="text-primary"><%=  t('rental_stations.all_stations') %></h1>
+        <% if Current.user && Current.user.role=='Provider'%>
+        <%= link_to t('rental_stations.add_new_station'), new_rental_station_path, class: "btn btn-success" %>
+        <% end %>
+    </div>
+
+    <div class="card mb-4  border-0">
+        <div class="card-body">
+            <%= form_with url: rental_stations_path, method: :get, class: "row g-3", data: { turbo: false } do |f| %>
+            <div class="col-md-5">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <%= f.text_field :search, value: params[:search], class: "form-control", placeholder: t('common.search_placeholder') %>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <%= f.select :filter, 
+            [
+              ["All Types", ""],
+              ["Car-Petrol", "Car-Petrol"],
+              ["Car-Diesel", "Car-Diesel"],
+              ["Car-Electric", "Car-Electric"],
+              ["Scooter", "Scooter"],
+              ["E-Scooter", "E-Scooter"],
+              ["Bike", "Bike"],
+              ["E-Bike", "E-Bike"],
+              ["Bus", "Bus"]
+            ],
+            { selected: params[:filter] },
+            { class: "form-select" }
+          %>
+            </div>
+            <div class="col-md-2">
+                <%= f.select :status, 
+            [
+              ["All Status", ""],
+              ["Active", "Active"],
+              ["Inactive", "Inactive"]
+            ],
+            { selected: params[:status] },
+            { class: "form-select" }
+          %>
+            </div>
+
+            <div class="col-md-2">
+                <%= f.select :city, 
+            [
+              ["All cities", ""],
+              ["Delhi NCR", "Delhi NCR"],
+              ["Bangalore", "Bangalore"],
+              ["Pune", "Pune"],
+              ["Hyderabad", "Hyderabad"],
+              ["Dehradun", "Dehradun"],
+              ["Kolkata", "Kolkata"],
+              ["Chennai", "Chennai"],
+              ["Mumbai", "Mumbai"],
+              ["Lucknow", "Lucknow"],
+              ["Jaipur", "Jaipur"],
+              ["Ahmedabad", "Ahmedabad"],
+              ["Indore", "Indore"],
+              ["Goa", "Goa"]
+
+            ],
+            { selected: params[:city] },
+            { class: "form-select" }
+          %>
+            </div>
+
+            <div class="col-md-1">
+                <div class="d-grid">
+                    <%= f.submit t('common.search'), class: "btn btn-dark" %>
+                </div>
+            </div>
+            <% end %>
+        </div>
+    </div>
+
+    <% if params[:search].present? || params[:filter].present? || params[:status].present? || params[:city].present? %>
+    <div class="alert alert-info mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                Showing <%= @rental_stations.count %> search results
+                <% if params[:search].present? %>
+                for "<%= params[:search] %>"
+                <% end %>
+                <% if params[:filter].present? %>
+                in <%= params[:filter] %>
+                <% end %>
+                <% if params[:status].present? %>
+                with status <%= params[:status] %>
+                <% end %>
+                <% if params[:city].present? %>
+                in <%= params[:city] %>
+                <% end %>
+            </div>
+            <%= link_to "Clear Search", rental_stations_path, class: "btn btn-sm btn-outline-primary" %>
+        </div>
+    </div>
+    <% end %>
+
+    <% if @rental_stations.any? %>
+    <div class="row row-cols-1 row-cols-md-2 g-4">
+        <% @rental_stations.each do |station| %>
+        <div class="col">
+            <div class="card shadow-sm border-0 h-100">
+                <% if station.image_url.present? %>
+                <img src="<%= station.image_url %>" class="card-img-top" alt="<%= station.name %> image" style="max-height: 250px; object-fit: cover; border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem;">
+                <% else %>
+                <img src="https://via.placeholder.com/600x250?text=No+Image" class="card-img-top" alt="Placeholder image" style="max-height: 250px; object-fit: cover;">
+                <% end %>
+
+                <div class="card-body">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h5 class="card-title fw-bold text-dark"><%= station.name %></h5>
+                        <%= link_to t('rental_stations.show_vehicles'), rental_station_vehicles_path(station), class: "btn btn-dark btn-sm me-2" %>
+                    </div>
+
+                    <p class="card-text mb-2"><strong><%=t('common.city')%> :</strong> <%= station.city %></p>
+                    <p class="card-text mb-2"><strong><%=t('common.type')%> :</strong> <%= station.station_type %></p>
+                    <p class="card-text mb-2"><strong><%=t('common.status')%> :</strong> <span class="badge bg-<%= station.status == 'Active' ? 'success' : 'secondary' %>"><%= station.status %></span></p>
+
+                    <div class="d-flex justify-content-between mb-3">
+                    <p class="card-text mb-2"><strong><%=t('common.average_rating')%> :</strong> 
+                        <span class="text-muted"> 
+                            <% if station.average_rating.present? %>
+                            <%= station.average_rating %>⭐(<%= station.review_count %> <%= t('common.reviews')%> )
+                            <% else %>
+                            Not Rated
+                            <% end %>
+                        </span>
+                    </p>
+
+
+                    <%= link_to t('common.view_reviews'), station_reviews_path(station), class: "btn btn-warning btn-sm mb-2" %>
+                    </div>
+
+
+
+
+                    <div class="d-flex justify-content-between">
+
+
+
+                        <% if station.user_id == Current.user.id %>
+                        <%= button_to t('common.delete'), rental_station_path(station), method: :delete, class: "btn btn-outline-danger btn-sm" %>
+                        <%= link_to t('common.edit'), edit_rental_station_path(station), class: "btn btn-primary btn-sm me-2" %>
+
+
+
+                        <% end %>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% end %>
+    </div>
+    <% end %>
+
+
+</div>
+
+<% if @rental_stations.any? %>
+<div class="custom-pagination pagination d-flex justify-content-center my-4">
+  <%= will_paginate @rental_stations %>
+</div>
+<% end %>
+
+
+<style>
+.custom-pagination .pagination {
+  display: flex;
+  list-style: none;
+  padding-left: 0;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-pagination .pagination a,
+.custom-pagination .pagination span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px; 
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 500;
+  min-width: 42px;
+  height: 42px;
+  line-height: 1;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.custom-pagination .pagination a:hover:not(.disabled):not(.current) {
+  background-color: #0d6efd;
+  color: #fff;
+  border-color: #0d6efd;
+}
+
+.custom-pagination .pagination .current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background-color: #0d6efd;
+  color: #fff;
+  border: 1px solid #0d6efd;
+  min-width: 42px;
+  height: 42px;
+  line-height: 1;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.custom-pagination .pagination .disabled {
+  background-color: #f8f9fa;
+  color: #adb5bd;
+  border-color: #dee2e6;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+</style>

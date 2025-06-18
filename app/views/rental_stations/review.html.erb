@@ -1,0 +1,68 @@
+<div class="container py-4">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h2><%= @rental_station.name %> - <%=t('common.reviews')%></h2>
+      <p class="text-muted">
+        <i class="bi bi-geo-alt-fill"></i> <%= @rental_station.city %>
+      </p>
+      <div class="d-flex align-items-center mb-2">
+        <div class="text-warning me-2">
+          <% @average_rating.to_i.times do %>
+            <i class="bi bi-star-fill"></i>
+          <% end %>
+          <% if @average_rating % 1 >= 0.5 %>
+            <i class="bi bi-star-half"></i>
+          <% end %>
+          <% (5 - @average_rating.ceil).times do %>
+            <i class="bi bi-star"></i>
+          <% end %>
+        </div>
+        <span><strong><%= @average_rating %></strong> out of 5 (<%= @review_count %> <%=t('common.reviews')%>)</span>
+      </div>
+      <%= link_to t('rental_stations.back_to_station'), rental_stations_path, class: "btn btn-sm btn-outline-dark" %>
+    </div>
+    <div class="col-md-4 text-md-end">
+      <% if @rental_station.image_url.present? %>
+        <img src="<%= @rental_station.image_url %>" alt="<%= @rental_station.name %>" class="img-thumbnail" style="max-height: 100px;">
+      <% end %>
+    </div>
+  </div>
+
+  <% if @reviews.any? %>
+    <div class="row">
+      <div class="col-12">
+        <% @reviews.each do |review| %>
+          <div class="card mb-3">
+            <div class="card-body">
+              <div class="d-flex justify-content-between mb-2">
+                <div>
+                  <div class="text-warning">
+                    <% review.station_rating.times do %>
+                      <i class="bi bi-star-fill"></i>
+                    <% end %>
+                    <% (5 - review.station_rating).times do %>
+                      <i class="bi bi-star"></i>
+                    <% end %>
+                  </div>
+                </div>
+                <small class="text-muted"><%= review.reviewed_at&.strftime("%b %d, %Y") %></small>
+              </div>
+              
+              <% if review.station_review.present? %>
+                <p class="card-text"><%= review.station_review %></p>
+              <% else %>
+                <p class="card-text text-muted fst-italic">No comments provided.</p>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    
+  <% else %>
+    <div class="alert alert-info">
+      <i class="bi bi-info-circle me-2"></i> <%= t('rental_stations.no_reviews') %>
+    </div>
+  <% end %>
+  
+</div>

@@ -1,0 +1,78 @@
+<nav class="navbar navbar-expand-lg bg-body-tertiary bg-dark border-bottom border-body" data-bs-theme="dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="/"><%= t('app_name') %></a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+
+                <li class="nav-item">
+                    <%= link_to t('nav.rental_stations'), rental_stations_path , class: "nav-link" %>
+                </li>
+                <% if Current.user %>
+
+                <li class="nav-item">
+
+                    <%= button_to t('nav.logout'), logout_path,method: :delete , class: "nav-link" %>
+                </li>
+
+                <li class="nav-item">
+                    <div class="d-flex">
+
+                        <%= link_to t('nav.dashboard'), dashboard_path, class: "nav-link" %>
+                        <% if Current.user && Booking.where(provider_id: Current.user.id, status: "pending").any? %>
+                        <i class="fa-solid fa-circle fa-2xs" style="color: #FF0000;margin-top:0.55rem;margin-left:-0.2rem;"></i>
+
+                        <% elsif Current.user && Booking.where(customer_id: Current.user.id, status: "pending").any? %>
+                        <i class="fa-solid fa-circle fa-2xs" style="color: #FF0000;margin-top:0.55rem;margin-left:-0.5rem;"></i>
+
+                        <% elsif Current.user && Booking.where(customer_id: Current.user.id, status: "accepted").any? %>
+                        <i class="fa-solid fa-circle fa-2xs" style="color: #FF0000;margin-top:0.55rem;margin-left:-0.5rem;"></i>
+
+
+                        <% end %>
+                    </div>
+                </li>
+
+                <% else %>
+                <li class="nav-item">
+                    <%= link_to t('nav.signup'), sign_up_path ,class: "nav-link" %>
+                </li>
+                <li class="nav-item">
+
+                    <%= link_to t('nav.login'), sign_in_path, class: "nav-link" %>
+
+                </li>
+
+                <% end %>
+                <li class="nav-item dropdown mt-1">
+                    <a class="nav-link dropdown-toggle py-1" href="#" id="languageDropdown" role="button" 
+                       data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-globe fs-6"></i>
+                    <span class="d-none d-lg-inline-block ms-1 small"><%= t('nav.language') %></span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="languageDropdown">
+                        <li>
+                            <%= link_to language_switch_path(locale: :en), class: "dropdown-item #{I18n.locale == :en ? 'active' : ''}" do %>
+                            <span class="flag-icon flag-icon-us me-2 small"></span> English
+                            <% end %>
+                        </li>
+                        <li>
+                            <%= link_to language_switch_path(locale: :hi), class: "dropdown-item #{I18n.locale == :hi ? 'active' : ''}" do %>
+                            <span class="flag-icon flag-icon-in me-2 small"></span> हिन्दी
+                            <% end %>
+                        </li>
+                    </ul>
+                </li>
+
+
+
+
+
+
+
+            </ul>
+        </div>
+    </div>
+</nav>

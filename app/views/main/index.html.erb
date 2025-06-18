@@ -1,0 +1,197 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css">
+
+<div class="home-banner position-relative">
+  <div class="banner-overlay position-absolute top-0 start-0 w-100 h-100 bg-dark" style="opacity: 0.5;"></div>
+  <div class="container position-relative py-5">
+    <div class="row py-5 align-items-center">
+      <div class="col-lg-6 text-white" data-aos="fade-right" data-aos-duration="600">
+        <h1 class="display-4 fw-bold mb-4"><%= t('app_name') %></h1>
+        <h3 class="mb-4"><%= t('home.welcome') %></h3>
+        <p class="lead mb-4"><%= t('home.tagline') %></p>
+        <div class="d-flex gap-3" data-aos="fade-up" data-aos-duration="400" data-aos-delay="100">
+          <% if Current.user %>
+            <%= link_to t('home.Browse_vehicles'), rental_stations_path, class: "btn btn-primary btn-lg" %>
+          <% else %>
+            <%= link_to t('home.Get_Started'), sign_up_path, class: "btn btn-primary btn-lg" %>
+            <%= link_to t('home.Learn_more'), "#features", class: "btn btn-outline-light btn-lg" %>
+          <% end %>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<section id="features" class="py-5 bg-light">
+  <div class="container py-4">
+    <div class="text-center mb-5" data-aos="fade-up" data-aos-duration="500">
+      <h2 class="display-5 fw-bold"><%= t('home.Why_Choose_MetroPulse') %></h2>
+      <p class="lead text-muted"><%= t('home.why_choose_tagline') %></p>
+    </div>
+    
+    <div class="row g-4">
+      <div class="col-md-4" data-aos="zoom-in" data-aos-duration="500">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon bg-primary bg-gradient text-white mb-3 mx-auto rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+              <i class="bi bi-car-front-fill fs-4"></i>
+            </div>
+            <h3 class="fs-4 fw-bold"><%= t('home.Diverse_Fleet')%></h3>
+            <p class="text-muted"><%= t('home.diverse_fleet_desc')%></p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="50">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon bg-success bg-gradient text-white mb-3 mx-auto rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+              <i class="bi bi-calendar-check fs-4"></i>
+            </div>
+            <h3 class="fs-4 fw-bold"><%= t('home.Flexible_Booking')%></h3>
+            <p class="text-muted"><%= t('home.flexible_booking_desc')%></p>
+          </div>
+        </div>
+      </div>
+      
+      <div class="col-md-4" data-aos="zoom-in" data-aos-duration="500" data-aos-delay="100">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon bg-danger bg-gradient text-white mb-3 mx-auto rounded-circle d-flex align-items-center justify-content-center" style="width: 60px; height: 60px;">
+              <i class="bi bi-geo-alt-fill fs-4"></i>
+            </div>
+            <h3 class="fs-4 fw-bold"><%= t('home.Multiple_Locations')%></h3>
+            <p class="text-muted"><%= t('home.multiple_locations_desc')%></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 mb-4 mb-lg-0" data-aos="fade-right" data-aos-duration="600">
+        <img src="https://images.unsplash.com/photo-1511286148006-ec48824e3282?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2340&q=80" alt="App screenshot" class="img-fluid rounded-4 shadow-lg">
+      </div>
+      <div class="col-lg-6" data-aos="fade-left" data-aos-duration="600">
+        <h2 class="display-6 fw-bold mb-4"><%= t('home.how_it_works') %></h2>
+        <div class="d-flex mb-4" data-aos="fade-up" data-aos-duration="400" data-aos-delay="50">
+          <div class="bg-primary rounded-circle text-white fw-bold d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 50px; height: 50px;">1</div>
+          <div>
+            <h4 class="fw-bold"><%= t('home.step1') %></h4>
+            <p class="text-muted"><%= t('home.step11') %></p>
+          </div>
+        </div>
+        <div class="d-flex mb-4" data-aos="fade-up" data-aos-duration="400" data-aos-delay="100">
+          <div class="bg-primary rounded-circle text-white fw-bold d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 50px; height: 50px;">2</div>
+          <div>
+            <h4 class="fw-bold"><%= t('home.step2') %></h4>
+            <p class="text-muted"><%= t('home.step21') %></p>
+          </div>
+        </div>
+        <div class="d-flex mb-4" data-aos="fade-up" data-aos-duration="400" data-aos-delay="150">
+          <div class="bg-primary rounded-circle text-white fw-bold d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 50px; height: 50px;">3</div>
+          <div>
+            <h4 class="fw-bold"><%= t('home.step3') %></h4>
+            <p class="text-muted"><%= t('home.step31') %></p>
+          </div>
+        </div>
+        <div class="d-flex" data-aos="fade-up" data-aos-duration="400" data-aos-delay="200">
+          <div class="bg-primary rounded-circle text-white fw-bold d-flex align-items-center justify-content-center me-3 flex-shrink-0" style="width: 50px; height: 50px;">4</div>
+          <div>
+            <h4 class="fw-bold"><%= t('home.step4') %></h4>
+            <p class="text-muted"><%= t('home.step41') %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="text-center mb-5" data-aos="fade-up" data-aos-duration="500">
+      <h2 class="display-5 fw-bold"><%= t('home.Popular_Vehicles') %></h2>
+      <p class="lead text-muted"><%= t('home.popular_vehicles_desc') %></p>
+    </div>
+    
+    <div class="row g-4">
+      <% Vehicle.where(available: true).order(created_at: :asc).limit(3).each_with_index do |vehicle, index| %>
+        <div class="col-lg-4 col-md-6" data-aos="flip-up" data-aos-duration="400" data-aos-delay="<%= index * 50 %>">
+          <div class="card h-100 border-0 shadow-sm">
+            <% if vehicle.image_url.present? %>
+              <img src="<%= vehicle.image_url %>" class="card-img-top" alt="<%= vehicle.name %>" style="height: 200px; object-fit: cover;">
+            <% else %>
+              <img src="https://via.placeholder.com/400x200?text=No+Image" class="card-img-top" alt="No image">
+            <% end %>
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <h5 class="card-title fw-bold mb-0"><%= vehicle.name %></h5>
+                <span class="badge bg-success">₹<%= vehicle.price_per_hour %>/hour</span>
+              </div>
+              <p class="card-text text-muted small"><%= vehicle.condition %></p>
+              <div class="d-grid">
+                <%= link_to t('home.view_details'), rental_station_vehicles_path(vehicle.rental_station), class: "btn btn-outline-primary" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="text-center mt-4" data-aos="zoom-in" data-aos-duration="300">
+      <%= link_to t('home.Browse_All_Vehicles'), rental_stations_path, class: "btn btn-primary btn-lg" %>
+    </div>
+  </div>
+</section>
+
+<section class="py-5 bg-dark text-white">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 text-center" data-aos="fade-up" data-aos-duration="500">
+        <h2 class="display-5 fw-bold mb-4"><%= t('home.footer_heading') %></h2>
+        <p class="lead mb-4"><%= t('home.footer_subheading') %></p>
+        <div data-aos="fade-up" data-aos-duration="300" data-aos-delay="100">
+          <% if Current.user %>
+            <%= link_to t('home.explore_vehicles'), rental_stations_path, class: "btn btn-light btn-lg" %>
+          <% else %>
+            <%= link_to t('home.sign_up_now'), sign_up_path, class: "btn btn-light btn-lg px-4 me-2" %>
+            <%= link_to t('home.Learn_more'), "#features", class: "btn btn-outline-light btn-lg px-4" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .home-banner {
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
+                url('https://images.unsplash.com/photo-1611429532458-f8bf8f6121fe?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80') no-repeat center center;
+    background-size: cover;
+    padding: 80px 0;
+    position: relative;
+  }
+  
+  @media (max-width: 768px) {
+    .home-banner {
+      padding: 50px 0;
+    }
+  }
+</style>
+
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    AOS.init({
+      duration: 500,      
+      easing: 'ease-out', 
+      once: true,         
+      offset: 50,         
+      delay: 0            
+    });
+  });
+</script>
+

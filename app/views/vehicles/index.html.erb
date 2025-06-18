@@ -1,0 +1,370 @@
+<div class="container my-5">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="text-primary"><%= @station.name %><%= t('vehicles.particular_vehicle') %></h2>
+    <% if @station.user_id == Current.user.id %>
+    <%= link_to t('vehicles.add_vehicle'), new_rental_station_vehicle_path(@station), class: "btn btn-success" %>
+    <% end %>
+  </div>
+
+
+
+  <div class="card mb-4  border-0">
+        <div class="card-body">
+            <%= form_with url: rental_station_vehicles_path, method: :get, class: "row g-3", data: { turbo: false } do |f| %>
+            <div class="col-md-3">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <%= f.text_field :search, value: params[:search], class: "form-control", placeholder: t('vehicles.search_placeholder') %>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <%= f.select :condition, 
+            [
+              ['Any Conditions', ''],
+             ['Brand New < 1 year Used', 'Brand New < 1 year Used'],
+             ['New 2-4 Year Used', 'New 2-4 Year Used'],
+             ['Mid 5-7 Years Used', 'Mid 5-7 Years Used'],
+             ['Old > 7 years Old', 'Old > 7 years Old'],
+            ],
+            { selected: params[:condition] },
+            { class: "form-select" }
+          %>
+            </div>
+            <div class="col-md-2">
+                <%= f.select :status, 
+            [
+              ["All Status", ""],
+              ["Available", "Available"],
+              ["Booked Out", "false"]
+            ],
+            { selected: params[:status] },
+            { class: "form-select" }
+          %>
+            </div>
+
+          <div class="col-md-2">
+            <div class="input-group mb-3">
+              <span class="input-group-text">₹</span>
+              <%= number_field_tag :min_price, params[:min_price], class: "form-control", placeholder: "Min Price" %>
+            </div>
+          </div>
+
+          <div class="col-md-2">
+            <div class="input-group mb-3">
+              <span class="input-group-text">₹</span>
+              <%= number_field_tag :max_price, params[:max_price], class: "form-control", placeholder: "Max Price" %>
+            </div>
+          </div>
+
+
+            
+            <div class="col-md-1">
+                <div class="d-grid">
+                    <%= f.submit t('common.search'), class: "btn btn-dark" %>
+                </div>
+            </div>
+            <% end %>
+        </div>
+    </div>
+
+    <% if params[:search].present? || params[:condition].present? || params[:status].present? || params[:min_price].present? || params[:max_price].present? %>
+    <div class="alert alert-info mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                Showing <%= @vehicles.count %> search results
+                <% if params[:search].present? %>
+                for "<%= params[:search] %>"
+                <% end %>
+                <% if params[:condition].present? %>
+                in <%= params[:condition] %>
+                <% end %>
+               
+                <% if params[:status].present? %>
+                with status <%= params[:status] %>
+                <% end %>
+
+                <% if params[:min_price].present? && params[:max_price].present? %>
+                with price per Hour in between ₹<%= params[:min_price] %> and ₹<%= params[:max_price] %>
+                <% elsif params[:min_price].present? %>
+                with min price per Hour ₹<%= params[:min_price] %>
+                <% elsif params[:max_price].present? %>
+                with max price per Hour ₹<%= params[:max_price] %>
+                <% end %>
+                
+            </div>
+            <%= link_to "Clear Search", rental_station_vehicles_path, class: "btn btn-sm btn-outline-primary" %>
+        </div>
+    </div>
+    <% end %>
+
+
+
+  <% if @vehicles.any? %>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <% @vehicles.each do |vehicle| %>
+        <div class="col">
+          <div class="card h-100 shadow-sm border-0">
+            <% if vehicle.image_url.present? %>
+              <img src="<%= vehicle.image_url %>" class="card-img-top" alt="<%= vehicle.name %> image" style="height: 200px; object-fit: cover;">
+            <% else %>
+              <img src="https://via.placeholder.com/400x200?text=No+Image" class="card-img-top" alt="No image available" style="height: 200px; object-fit: cover;">
+            <% end %>
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+              <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title text-dark fw-bold"><%= vehicle.name %></h5>
+                <% if vehicle.available && Current.user.role=='Customer' && @station.status=='Active' %>
+
+                  <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#bookingModal<%= vehicle.id %>">
+                    <%= t('common.book_now') %>
+                  </button>
+
+                  <div class="modal fade" id="bookingModal<%= vehicle.id %>" tabindex="-1" aria-labelledby="bookingModalLabel<%= vehicle.id %>" aria-hidden="true">
+                    <div class="modal-dialog">
+                      <div class="modal-content">
+                        <div class="modal-header">
+                          <h5 class="modal-title" id="bookingModalLabel<%= vehicle.id %>">Book <%= vehicle.name %></h5>
+                          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                          <%= form_with url: create_vehicle_booking_path(vehicle), method: :post do |form| %>
+                            <div class="mb-3">
+                              <label for="duration<%= vehicle.id %>" class="form-label">How many hours do you want to book?</label>
+                              <select name="duration" id="duration<%= vehicle.id %>" class="form-select" onchange="updateTotalPrice(<%= vehicle.id %>, <%= vehicle.price_per_hour %>)">
+                                <% (1..8).each do |i| %>
+                                  <option value="<%= i %>"><%= i %> hour<%= i > 1 ? 's' : '' %></option>
+                                <% end %>
+                              </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                              <label for="start_time<%= vehicle.id %>" class="form-label">Select start time</label>
+                              <select name="start_time" id="start_time<%= vehicle.id %>" class="form-select" onchange="updateBookingSlot(<%= vehicle.id %>, <%= vehicle.price_per_hour %>)">
+                                <% 
+
+                                  start_times = [
+                                    "09:00 AM",
+                                    "10:00 AM",
+                                    "11:00 AM",
+                                    "12:00 PM",
+                                    "01:00 PM",
+                                    "02:00 PM",
+                                    "03:00 PM",
+                                    "04:00 PM",
+                                    "05:00 PM",
+                                    "06:00 PM"
+                                  ]
+                                  
+                                  booked_slots = Booking.where(
+                                    vehicle_id: vehicle.id,
+                                    booking_date: Date.current,
+                                    status: ["pending", "accepted"]
+                                  ).pluck(:booking_slot)
+                                %>
+                                
+                                <% start_times.each do |time| %>
+                                  <% 
+                                    slot_booked = booked_slots.any? { |slot| slot.start_with?(time) }
+                                  %>
+                                  <option value="<%= time %>" <%= 'disabled' if slot_booked %>>
+                                    <%= time %><%= slot_booked ? " (Booked)" : "" %>
+                                  </option>
+                                <% end %>
+                              </select>
+                            </div>
+                            
+                            <div class="mb-3">
+                              <label for="booking_slot<%= vehicle.id %>" class="form-label">Your booking slot</label>
+                              <input type="text" name="booking_slot" id="booking_slot<%= vehicle.id %>" class="form-control bg-light" readonly>
+                            </div>
+                            
+                            <div class="mb-3">
+                              <label class="form-label">Total Price</label>
+                              <div id="totalPrice<%= vehicle.id %>" class="form-control bg-light">₹<%= vehicle.price_per_hour %></div>
+                            </div>
+                            
+                            <div class="d-grid">
+                              <%= form.submit "Confirm Booking", class: "btn btn-primary" %>
+                            </div>
+                          <% end %>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <% elsif @station.status!='Active' && Current.user.role=='Customer' %>
+                  <span class="badge bg-secondary">Station Inactive</span>
+                <% elsif !vehicle.available && Current.user.role=='Customer'%>
+                  <% booking = Booking.find_by(vehicle_id: vehicle.id, status: "pending") %>
+                  
+                  <% if booking && (booking.provider_id == Current.user.id || booking.customer_id == Current.user.id) %>
+                    <%= button_to t('common.cancel'), cancel_booking_path(booking), method: :post, class: "btn btn-danger btn-sm" %>
+                  <% else %>
+                    <span class="badge bg-danger">Booked Out</span>
+                  <% end %>
+                <% elsif !vehicle.available && Current.user.role=='Provider' %>
+                    <span class="badge bg-danger">Booked Out</span>
+                <% end %>
+              </div>
+                <p class="card-text text-muted"><strong><%= t('vehicles.condition') %> :</strong> <%= vehicle.condition %></p>
+                <p class="card-text text-muted"><strong><%= t('vehicles.availablility_status') %> :</strong>
+                 <% if vehicle.available %>
+                  <span class="badge bg-success"><%= t('vehicles.available') %></span>
+                  <% else %>
+                  <span class="badge bg-danger"><%= t('vehicles.not_available') %></span>
+                  <% end %>
+                 </p>
+                <p class="card-text text-muted"><strong><%= t('vehicles.Price') %> : </strong> <%= vehicle.price_per_hour %>₹/hour</p>
+
+                <p class="card-text text-muted"><strong><%= t('common.average_rating') %> : </strong><%= vehicle.average_rating %>⭐(<%= vehicle.review_count %> <%= t('common.reviews')%>)</p>
+                <%= link_to t('vehicles.see_all_reviews') ,vehicle_reviews_path(vehicle), class: "btn btn-warning btn-sm" %>
+
+              </div>
+              <% if @station.user_id == Current.user.id %>
+                <div class="mt-3 d-flex justify-content-between">
+                  <%= link_to t('common.edit'), edit_rental_station_vehicle_path(@station,vehicle), class: "btn btn-primary btn-sm" %>
+                  <%= button_to t('common.delete'), delete_rental_station_vehicle_path(@station,vehicle), method: :delete, class: "btn btn-outline-danger btn-sm" %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-muted">You haven't added any vehicles yet.</p>
+  <% end %>
+</div>
+
+<% if @vehicles.any? %>
+<div class="custom-pagination pagination d-flex justify-content-center my-4">
+  <%= will_paginate @vehicles %>
+</div>
+<% end %>
+
+
+<style>
+.custom-pagination .pagination {
+  display: flex;
+  list-style: none;
+  padding-left: 0;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-pagination .pagination a,
+.custom-pagination .pagination span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px; 
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 500;
+  min-width: 42px;
+  height: 42px;
+  line-height: 1;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.custom-pagination .pagination a:hover:not(.disabled):not(.current) {
+  background-color: #0d6efd;
+  color: #fff;
+  border-color: #0d6efd;
+}
+
+.custom-pagination .pagination .current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background-color: #0d6efd;
+  color: #fff;
+  border: 1px solid #0d6efd;
+  min-width: 42px;
+  height: 42px;
+  line-height: 1;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.custom-pagination .pagination .disabled {
+  background-color: #f8f9fa;
+  color: #adb5bd;
+  border-color: #dee2e6;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+</style>
+
+
+
+<script>
+  function updateTotalPrice(vehicleId, pricePerHour) {
+    const duration = document.getElementById('duration' + vehicleId).value;
+    const totalPrice = duration * pricePerHour;
+    document.getElementById('totalPrice' + vehicleId).innerHTML = '₹' + totalPrice;
+  }
+  
+  function updateBookingSlot(vehicleId, pricePerHour) {
+    const duration = parseInt(document.getElementById('duration' + vehicleId).value);
+    const startTime = document.getElementById('start_time' + vehicleId).value;
+    
+    let endTime = calculateEndTime(startTime, duration);
+    
+    const bookingSlot = document.getElementById('booking_slot' + vehicleId);
+    bookingSlot.value = startTime + " - " + endTime;
+    
+    updateTotalPrice(vehicleId, pricePerHour);
+  }
+  
+  function calculateEndTime(startTime, duration) {
+    let timeComponents = startTime.split(' ');
+    let period = timeComponents[1]; 
+    
+    let [hours, minutes] = timeComponents[0].split(':');
+    hours = parseInt(hours);
+    minutes = parseInt(minutes || 0);
+    
+    if (period === 'PM' && hours < 12) {
+      hours += 12;
+    } else if (period === 'AM' && hours === 12) {
+      hours = 0;
+    }
+    
+    let endHours = hours + parseInt(duration);
+    
+    let endPeriod = 'AM';
+    if (endHours >= 12 && endHours < 24) {
+      endPeriod = 'PM';
+      if( endHours >12){
+        endHours-=12;
+        if (endHours>=12){
+          endHours=endHours%12;
+        }
+      }
+      
+    }
+    else{
+      if (endHours >= 24) {
+        endHours -= 24;
+      }
+    }
+  
+    
+    return `${endHours}:${minutes.toString()}`+"0 "+ `${endPeriod}`;
+  }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    <% @vehicles.each do |vehicle| %>
+      <% if vehicle.available && Current.user&.role == 'Customer' && @station.status == 'Active' %>
+        updateBookingSlot(<%= vehicle.id %>, <%= vehicle.price_per_hour %>);
+      <% end %>
+    <% end %>
+  });
+</script>

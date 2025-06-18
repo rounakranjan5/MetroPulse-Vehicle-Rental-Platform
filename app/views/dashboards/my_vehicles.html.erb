@@ -1,0 +1,292 @@
+<div class="container my-5">
+  <h2 class="mb-4 text-primary fw-bold">My Vehicles</h2>
+ 
+    <% if @stations.any? %>
+    <div class="mb-3">
+      <% @stations.each do |station| %>
+        <%= link_to "Add Vehicle to #{station.name}", new_rental_station_vehicle_path(station), class: "btn btn-success mb-2 me-2" %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="card mb-4  border-0">
+        <div class="card-body">
+            <%= form_with url: dashboard_my_vehicles_path, method: :get, class: "row g-3", data: { turbo: false } do |f| %>
+            <div class="col-md-3">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <%= f.text_field :search, value: params[:search], class: "form-control", placeholder: "Search by name or condition" %>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <%= f.select :condition, 
+            [
+              ['Any Conditions', ''],
+             ['Brand New < 1 year Used', 'Brand New < 1 year Used'],
+             ['New 2-4 Year Used', 'New 2-4 Year Used'],
+             ['Mid 5-7 Years Used', 'Mid 5-7 Years Used'],
+             ['Old > 7 years Old', 'Old > 7 years Old'],
+            ],
+            { selected: params[:condition] },
+            { class: "form-select" }
+          %>
+            </div>
+            <div class="col-md-2">
+                <%= f.select :status, 
+            [
+              ["All Status", ""],
+              ["Available", "Available"],
+              ["Booked Out", "false"]
+            ],
+            { selected: params[:status] },
+            { class: "form-select" }
+          %>
+            </div>
+
+          <div class="col-md-2">
+            <div class="input-group mb-3">
+              <span class="input-group-text">₹</span>
+              <%= number_field_tag :min_price, params[:min_price], class: "form-control", placeholder: "Min Price" %>
+            </div>
+          </div>
+
+          <div class="col-md-2">
+            <div class="input-group mb-3">
+              <span class="input-group-text">₹</span>
+              <%= number_field_tag :max_price, params[:max_price], class: "form-control", placeholder: "Max Price" %>
+            </div>
+          </div>
+
+
+            
+            <div class="col-md-1">
+                <div class="d-grid">
+                    <%= f.submit "Search", class: "btn btn-dark" %>
+                </div>
+            </div>
+            <% end %>
+        </div>
+    </div>
+
+    <% if params[:search].present? || params[:condition].present? || params[:status].present? || params[:min_price].present? || params[:max_price].present? %>
+    <div class="alert alert-info mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                Showing <%= @vehicles.count %> search results
+                <% if params[:search].present? %>
+                for "<%= params[:search] %>"
+                <% end %>
+                <% if params[:condition].present? %>
+                in <%= params[:condition] %>
+                <% end %>
+               
+                <% if params[:status].present? %>
+                with status <%= params[:status] %>
+                <% end %>
+
+                <% if params[:min_price].present? && params[:max_price].present? %>
+                with price per Hour in between ₹<%= params[:min_price] %> and ₹<%= params[:max_price] %>
+                <% elsif params[:min_price].present? %>
+                with min price per Hour ₹<%= params[:min_price] %>
+                <% elsif params[:max_price].present? %>
+                with max price per Hour ₹<%= params[:max_price] %>
+                <% end %>
+                
+            </div>
+            <%= link_to "Clear Search", dashboard_my_vehicles_path, class: "btn btn-sm btn-outline-primary" %>
+        </div>
+    </div>
+    <% end %>
+   
+  <% if @vehicles.any? %>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+      <% @vehicles.each do |vehicle| %>
+        <div class="col">
+          <div class="card h-100 shadow-sm border-0">
+            <% if vehicle.image_url.present? %>
+              <img src="<%= vehicle.image_url %>" class="card-img-top" alt="<%= vehicle.name %>" style="height: 180px; object-fit: cover; border-top-left-radius: 0.5rem; border-top-right-radius: 0.5rem;">
+            <% else %>
+              <img src="https://via.placeholder.com/400x180?text=No+Image" class="card-img-top" alt="No image" style="height: 180px; object-fit: cover;">
+            <% end %>
+            <div class="card-body d-flex flex-column justify-content-between">
+              <div>
+
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="card-title text-dark fw-bold"><%= vehicle.name %></h5>
+                <%= link_to "See All Reviews" ,vehicle_reviews_path(vehicle), class: "btn btn-warning btn-sm" %>                
+
+                </div>
+
+                <p class="card-text mb-1"><strong>Condition:</strong> <%= vehicle.condition %></p>
+                <p class="card-text mb-1"><strong>Availability Status :</strong> <%= vehicle.available %></p>
+                <p class="card-text mb-2"><strong>Station:</strong> <%= vehicle.rental_station.name %></p>
+                <p class="card-text mb-2"><strong>Price:</strong> <%= vehicle.price_per_hour %>₹/hour</p>
+
+                <p class="card-text mb-2"><strong>Average Rating : </strong><%= vehicle.average_rating %>⭐(<%= vehicle.review_count %> reviews)</p>
+
+
+                <%= form_with model: [vehicle.rental_station, vehicle], url: rental_station_vehicle_path(vehicle.rental_station, vehicle), method: :patch, local: true do |f| %>
+                  <div class="input-group input-group-sm">
+                    <%= f.select :rental_station_id, @stations.map { |s| [s.name, s.id] }, { selected: vehicle.rental_station_id }, class: "form-select" %>
+                    <button class="btn btn-outline-secondary" type="submit">Move</button>
+                  </div>
+                <% end %>
+              </div>
+              <div class="mt-3 d-flex gap-2">
+                <%= link_to "Edit", edit_rental_station_vehicle_path(vehicle.rental_station, vehicle), class: "btn btn-primary btn-sm flex-fill" %>
+                <%= button_to "Delete", delete_rental_station_vehicle_path(vehicle.rental_station, vehicle), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-outline-danger btn-sm flex-fill" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="alert alert-info mt-4">You have no vehicles.</div>
+  <% end %>
+</div>
+
+<% if @vehicles.any? %>
+<div class="custom-pagination pagination d-flex justify-content-center my-4">
+  <%= will_paginate @vehicles %>
+</div>
+<% end %>
+
+
+<style>
+.custom-pagination .pagination {
+  display: flex;
+  list-style: none;
+  padding-left: 0;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-pagination .pagination a,
+.custom-pagination .pagination span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px; 
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 500;
+  min-width: 42px;
+  height: 42px;
+  line-height: 1;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.custom-pagination .pagination a:hover:not(.disabled):not(.current) {
+  background-color: #0d6efd;
+  color: #fff;
+  border-color: #0d6efd;
+}
+
+.custom-pagination .pagination .current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background-color: #0d6efd;
+  color: #fff;
+  border: 1px solid #0d6efd;
+  min-width: 42px;
+  height: 42px;
+  line-height: 1;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.custom-pagination .pagination .disabled {
+  background-color: #f8f9fa;
+  color: #adb5bd;
+  border-color: #dee2e6;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+</style>
+
+
+
+<script>
+  function updateTotalPrice(vehicleId, pricePerHour) {
+    const duration = document.getElementById('duration' + vehicleId).value;
+    const totalPrice = duration * pricePerHour;
+    document.getElementById('totalPrice' + vehicleId).innerHTML = '₹' + totalPrice;
+    
+    updateBookingSlot(vehicleId, pricePerHour);
+  }
+  
+  function updateBookingSlot(vehicleId, pricePerHour) {
+    const duration = parseInt(document.getElementById('duration' + vehicleId).value);
+    const startTime = document.getElementById('start_time' + vehicleId).value;
+    
+    let endTime = calculateEndTime(startTime, duration);
+    
+    const bookingSlot = document.getElementById('booking_slot' + vehicleId);
+    bookingSlot.value = startTime + " - " + endTime;
+    
+    updateTotalPrice(vehicleId, pricePerHour);
+  }
+  
+  function calculateEndTime(startTime, hoursToAdd) {
+    const timeParts = startTime.split(':');
+    let hours = parseInt(timeParts[0]);
+    const period = startTime.includes("PM") ? "PM" : "AM";
+    
+    if (period === "PM" && hours !== 12) {
+      hours += 12;
+    } else if (period === "AM" && hours === 12) {
+      hours = 0;
+    }
+    
+    let newHours = (hours + hoursToAdd) % 24;
+    
+    let newPeriod = period;
+    if (hours < 12 && newHours >= 12) {
+      newPeriod = "PM";
+    } else if (hours >= 12 && newHours < 12) {
+      newPeriod = "AM";
+    }
+    
+    if (newHours > 12) {
+      newHours -= 12;
+    } else if (newHours === 0) {
+      newHours = 12;
+    }
+    
+    return newHours + ":00 " + newPeriod;
+  }
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    <% @vehicles.each do |vehicle| %>
+      <% if vehicle.available %>
+        updateTotalPrice(<%= vehicle.id %>, <%= vehicle.price_per_hour %>);
+        
+        updateBookingSlot(<%= vehicle.id %>, <%= vehicle.price_per_hour %>);
+        
+        const durationSelect = document.getElementById('duration<%= vehicle.id %>');
+        const startTimeSelect = document.getElementById('start_time<%= vehicle.id %>');
+        
+        if (durationSelect) {
+          durationSelect.addEventListener('change', function() {
+            updateBookingSlot(<%= vehicle.id %>, <%= vehicle.price_per_hour %>);
+          });
+        }
+        
+        if (startTimeSelect) {
+          startTimeSelect.addEventListener('change', function() {
+            updateBookingSlot(<%= vehicle.id %>, <%= vehicle.price_per_hour %>);
+          });
+        }
+      <% end %>
+    <% end %>
+  });
+</script>

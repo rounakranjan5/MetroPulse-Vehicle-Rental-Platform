@@ -1,0 +1,73 @@
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow">
+        <div class="card-header bg-dark text-white">
+          <h2 class="mb-0">Add Your Review</h2>
+        </div>
+        <div class="card-body">
+          <%= form_with model: @booking, url: create_review_path(@booking), method: :post, local: true do |f| %>
+            
+            <% if @booking.errors.any? %>
+              <div class="alert alert-danger">
+                <h4>There were some errors:</h4>
+                <ul>
+                  <% @booking.errors.full_messages.each do |msg| %>
+                    <li><%= msg %></li>
+                  <% end %>
+                </ul>
+              </div>
+            <% end %>
+            
+            <div class="mb-4">
+              <h4 class="border-bottom pb-2">Vehicle Review: <%= @vehicle.name %></h4>
+              
+              <div class="mb-3">
+                <label class="form-label">Rating</label>
+                <div class="rating-stars d-flex mb-2">
+                  <% 5.times do |i| %>
+                    <div class="form-check me-3">
+                      <%= f.radio_button :vehicle_rating, i+1, class: "form-check-input", required: true %>
+                      <%= f.label "vehicle_rating_#{i+1}", "#{i+1} ⭐", class: "form-check-label" %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <%= f.label :vehicle_review, "Your Comments", class: "form-label" %>
+                <%= f.text_area :vehicle_review, class: "form-control", rows: 3, placeholder: "Share your experience with this vehicle..." %>
+              </div>
+            </div>
+            
+            <div class="mb-4">
+              <h4 class="border-bottom pb-2">Rental Station Review: <%= @rental_station.name %></h4>
+              
+              <div class="mb-3">
+                <label class="form-label">Rating</label>
+                <div class="rating-stars d-flex mb-2">
+                  <% 5.times do |i| %>
+                    <div class="form-check me-3">
+                      <%= f.radio_button :station_rating, i+1, class: "form-check-input", required: true %>
+                      <%= f.label "station_rating_#{i+1}", "#{i+1} ⭐", class: "form-check-label" %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+              
+              <div class="mb-3">
+                <%= f.label :station_review, "Your Comments", class: "form-label" %>
+                <%= f.text_area :station_review, class: "form-control", rows: 3, placeholder: "Share your experience with this rental station..." %>
+              </div>
+            </div>
+            
+            <div class="d-flex justify-content-between">
+              <%= link_to "Cancel", all_bookings_path, class: "btn btn-outline-danger" %>
+              <%= f.submit "Submit Review", class: "btn btn-success" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

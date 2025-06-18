@@ -1,0 +1,117 @@
+
+<div class="container my-5">
+  <h1 class="mb-4"><%=t('bookings.rental_history')%></h1>
+  
+  <% if @completed_rentals.any? %>
+    <div class="table-responsive">
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th><%= t('bookings.vehicle') %></th>
+            <th><%= t('bookings.station') %></th>
+            <th><%= t('bookings.location') %></th>
+            <th><%= t('bookings.booking_date') %></th>
+            <th><%= t('bookings.timeslot') %></th>
+            <th><%= t('bookings.duration') %></th>
+            <th><%= t('bookings.price') %></th>
+            <th><%= t('bookings.completedon') %></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @completed_rentals.each do |booking| %>
+            <tr>
+              <td>
+                <div class="d-flex align-items-center">
+                  <% if booking.vehicle&.image_url.present? %>
+                    <img src="<%= booking.vehicle.image_url %>" alt="<%= booking.vehicle_type %>" 
+                         class="me-2" style="width: 50px; height: 40px; object-fit: cover;">
+                  <% end %>
+                  <%= booking.vehicle_type %>
+                </div>
+              </td>
+              <td><%= booking.rental_station&.name %></td>
+              <td><%= booking.rental_station&.city %></td>
+              <td><%= booking.booking_date&.strftime("%d %b %Y, %I:%M %p") %></td>
+              <td><%= booking.booking_slot %></td>
+              <td><%= booking.duration %> hour(s)</td>
+              <td>₹<%= booking.price %></td>
+              <td><%= booking.updated_at.strftime("%d %b %Y, %I:%M %p") %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <div class="alert alert-info">
+      <p><%= t('bookings.no_rentalhistory') %></p>
+    </div>
+  <% end %>
+  
+</div>
+
+<% if @completed_rentals.any? %>
+<div class="custom-pagination pagination d-flex justify-content-center my-4">
+  <%= will_paginate @completed_rentals %>
+</div>
+<% end %>
+
+
+<style>
+.custom-pagination .pagination {
+  display: flex;
+  list-style: none;
+  padding-left: 0;
+  gap: 8px;
+  justify-content: center;
+  align-items: center;
+}
+
+.custom-pagination .pagination a,
+.custom-pagination .pagination span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px; 
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  color: #0d6efd;
+  text-decoration: none;
+  font-weight: 500;
+  min-width: 42px;
+  height: 42px;
+  line-height: 1;
+  transition: all 0.3s ease;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+
+.custom-pagination .pagination a:hover:not(.disabled):not(.current) {
+  background-color: #0d6efd;
+  color: #fff;
+  border-color: #0d6efd;
+}
+
+.custom-pagination .pagination .current {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem 0.9rem;
+  border-radius: 999px;
+  background-color: #0d6efd;
+  color: #fff;
+  border: 1px solid #0d6efd;
+  min-width: 42px;
+  height: 42px;
+  line-height: 1;
+  font-weight: 500;
+  pointer-events: none;
+}
+
+.custom-pagination .pagination .disabled {
+  background-color: #f8f9fa;
+  color: #adb5bd;
+  border-color: #dee2e6;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+</style>
