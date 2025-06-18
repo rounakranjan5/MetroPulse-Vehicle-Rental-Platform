@@ -1,6 +1,6 @@
 # 🚲 MetroPulse – Vehicle Rental Platform
 
-**MetroPulse** is a full-stack Ruby on Rails web application that serves as a micro-mobility rental platform tailored for urban India. It connects customers with electric scooter, e-bike, and bicycle rental providers in cities like Bengaluru, Mumbai, and Delhi. It aims to ease urban congestion through affordable, eco-friendly transport.
+**MetroPulse** is a full-stack Ruby on Rails web application that serves as a micro-mobility rental platform tailored for urban India. It connects customers with electric scooter, e-bike etc. rental providers in cities like Bengaluru, Mumbai , Delhi and many more . It aims to ease urban congestion through affordable, eco-friendly transport.
 
 ---
 
