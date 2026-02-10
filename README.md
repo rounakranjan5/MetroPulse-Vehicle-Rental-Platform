@@ -34,4 +34,4 @@
 ## 🌐 Live Demo
 
 🚀 Application is live at:  
-👉 [https://metropulse-mk9o.onrender.com/](https://metropulse-mk9o.onrender.com/)  
+👉 [https://metropulse-vehicle-rental-platform.onrender.com/](https://metropulse-mk9o.onrender.com/)  
