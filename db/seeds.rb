@@ -4,25 +4,33 @@
 
 # Load production seed data from SQL export
 if Rails.env.production?
-  puts "🌱 Seeding production database from export..."
-  
-  sql_file = File.join(Rails.root, 'db', 'production_seed_data.sql')
-  
-  if File.exist?(sql_file)
-    sql = File.read(sql_file)
-    # Remove lines that will cause issues in production
-    sql = sql.gsub(/\\restrict.*\n/, '')
-    sql = sql.gsub(/\\unrestrict.*\n/, '')
+  # Only seed if database is empty
+  if User.count == 0 && RentalStation.count == 0
+    puts "🌱 Seeding production database from export..."
     
-    # Execute the SQL
-    ActiveRecord::Base.connection.execute(sql)
+    sql_file = File.join(Rails.root, 'db', 'production_seed_data.sql')
     
-    puts "✅ Production data seeded successfully!"
+    if File.exist?(sql_file)
+      sql = File.read(sql_file)
+      # Remove lines that will cause issues in production
+      sql = sql.gsub(/\\restrict.*\n/, '')
+      sql = sql.gsub(/\\unrestrict.*\n/, '')
+      
+      # Execute the SQL
+      ActiveRecord::Base.connection.execute(sql)
+      
+      puts "✅ Production data seeded successfully!"
+      puts "   - #{User.count} users"
+      puts "   - #{RentalStation.count} rental stations"
+      puts "   - #{Vehicle.count} vehicles"
+    else
+      puts "⚠️  Seed file not found: #{sql_file}"
+    end
+  else
+    puts "⏭️  Database already has data, skipping seed"
     puts "   - #{User.count} users"
     puts "   - #{RentalStation.count} rental stations"
     puts "   - #{Vehicle.count} vehicles"
-  else
-    puts "⚠️  Seed file not found: #{sql_file}"
   end
 else
   puts "Skipping seed in #{Rails.env} environment"
