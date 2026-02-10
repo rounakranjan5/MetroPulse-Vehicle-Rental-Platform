@@ -5,6 +5,10 @@ on:
     branches:
       - PROD  # Deploy ONLY when pushing to PROD branch
 
+permissions:
+  deployments: write
+  contents: read
+
 jobs:
   deploy:
     name: Deploy to Production
