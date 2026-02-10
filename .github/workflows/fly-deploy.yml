@@ -7,9 +7,33 @@ on:
 
 jobs:
   deploy:
-    name: Trigger Render Deploy
+    name: Deploy to Production
     runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://metropulse-vehicle-rental-platform.onrender.com/
     steps:
-      - name: Trigger Render Deployment
+      - name: Start Deployment
+        uses: bobheadxi/deployments@v1
+        id: deployment
+        with:
+          step: start
+          token: ${{ secrets.GITHUB_TOKEN }}
+          env: production
+      
+      - name: Trigger Render Deploy
         run: |
           curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+      
+      - name: Wait for deployment
+        run: sleep 30
+      
+      - name: Update Deployment Status
+        uses: bobheadxi/deployments@v1
+        if: always()
+        with:
+          step: finish
+          token: ${{ secrets.GITHUB_TOKEN }}
+          status: ${{ job.status }}
+          env: ${{ steps.deployment.outputs.env }}
+          deployment_id: ${{ steps.deployment.outputs.deployment_id }}
